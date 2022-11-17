@@ -19,7 +19,7 @@ jobs:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.7+k3s1
       rancher_channel: latest
-      rancher_version: devel
+      rancher_version: 2.7.0-rc12
       runner: elemental-e2e-ci-runner-spot-x86-64-1
       test_type: ui
   ui-e2e-rke2:
@@ -33,6 +33,6 @@ jobs:
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.24.7+rke2r1
       rancher_channel: latest
-      rancher_version: devel
+      rancher_version: 2.7.0-rc12
       runner: elemental-e2e-ci-runner-spot-x86-64-1
       test_type: ui
