@@ -30,6 +30,7 @@ jobs:
       ca_type: private
       cluster_name: cluster-rke2
       k8s_version_to_provision: v1.24.8+rke2r1
+      machine_type: n2-standard-16
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui

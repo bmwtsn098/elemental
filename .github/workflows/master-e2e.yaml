@@ -71,7 +71,7 @@ on:
         type: string
 
 env:
-  runner_template: elemental-e2e-ci-runner-spot-x86-64-template-v2
+  runner_template: elemental-e2e-ci-runner-spot-x86-64-template-v3-test-julien
 
 jobs:
   create-runner:

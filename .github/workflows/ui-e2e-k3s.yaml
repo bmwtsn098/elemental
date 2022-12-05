@@ -28,6 +28,7 @@ jobs:
     with:
       cluster_name: cluster-k3s
       k8s_version_to_provision: v1.24.8+k3s1
+      machine_type: n2-standard-16
       rancher_channel: ${{ inputs.rancher_channel }}
       rancher_version: ${{ inputs.rancher_version }}
       test_type: ui
