@@ -15,7 +15,6 @@ limitations under the License.
 package e2e_test
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 	"time"
@@ -75,8 +74,11 @@ func waitForKnownState(condition, msg string) {
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 	var (
-		client  *tools.Client
-		macAdrs string
+		client     *tools.Client
+		macAdrs    string
+		machineReg string
+		poolName   string
+		poolType   string
 	)
 
 	BeforeEach(func() {
@@ -95,6 +97,19 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Password: userPassword,
 		}
 		macAdrs = hostData.Mac
+
+		// Set pool type and name
+		poolName = "pool-"
+		if vmIndex < 3 {
+			// First third nodes are in Master pool
+			poolType = "master"
+			poolName += poolType + "-" + clusterName
+		} else {
+			// The others are in Worker pool
+			poolType = "worker"
+			poolName += poolType + "-" + clusterName
+		}
+		machineReg = "machine-registration-" + poolType
 	})
 
 	It("Install node and add it in Rancher", func() {
@@ -110,7 +125,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			Expect(err).To(Not(HaveOccurred()))
 
 			out, err := kubectl.Run("patch", "MachineRegistration",
-				"--namespace", clusterNS, "machine-registration",
+				"--namespace", clusterNS, machineReg,
 				"--type", "merge", "--patch-file", emulatedTPMYaml,
 			)
 			Expect(err).To(Not(HaveOccurred()), out)
@@ -119,8 +134,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		By("Downloading installation config file", func() {
 			// Download the new YAML installation config file
 			tokenURL, err := kubectl.Run("get", "MachineRegistration",
-				"--namespace", clusterNS,
-				"machine-registration", "-o", "jsonpath={.status.registrationURL}")
+				"--namespace", clusterNS, machineReg,
+				"-o", "jsonpath={.status.registrationURL}")
 			Expect(err).To(Not(HaveOccurred()))
 
 			fileName := "../../install-config.yaml"
@@ -179,15 +194,9 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 
 		if vmIndex > 1 {
 			By("Increasing 'quantity' node of predefined cluster", func() {
-				// Patch the already-created yaml file directly
-				err := tools.Sed("quantity:.*", "quantity: "+fmt.Sprint(vmIndex), clusterYaml)
+				// Increase 'quantity' field
+				err := misc.IncreaseQuantity(clusterName, clusterNS, poolName)
 				Expect(err).To(Not(HaveOccurred()))
-
-				out, err := kubectl.Run("patch", "cluster",
-					"--namespace", clusterNS, clusterName,
-					"--type", "merge", "--patch-file", clusterYaml,
-				)
-				Expect(err).To(Not(HaveOccurred()), out)
 			})
 		}
 
