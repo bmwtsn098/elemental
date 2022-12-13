@@ -73,15 +73,12 @@ func waitForKnownState(condition, msg string) {
 }
 
 var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
-	var (
-		client     *tools.Client
-		macAdrs    string
-		machineReg string
-		poolName   string
-		poolType   string
-	)
+	It("Install node and add it in Rancher", func() {
+		var (
+			macAdrs  string
+			poolType string
+		)
 
-	BeforeEach(func() {
 		// Add node in network configuration if needed
 		if macAdrs == "" {
 			err := misc.AddNode(vmName, vmIndex, netDefaultFileName)
@@ -91,7 +88,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		hostData, err := tools.GetHostNetConfig(".*name=\""+vmName+"\".*", netDefaultFileName)
 		Expect(err).To(Not(HaveOccurred()))
 
-		client = &tools.Client{
+		client := &tools.Client{
 			Host:     string(hostData.IP) + ":22",
 			Username: userName,
 			Password: userPassword,
@@ -99,7 +96,7 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 		macAdrs = hostData.Mac
 
 		// Set pool type and name
-		poolName = "pool-"
+		poolName := "pool-"
 		if vmIndex < 3 {
 			// First third nodes are in Master pool
 			poolType = "master"
@@ -109,10 +106,8 @@ var _ = Describe("E2E - Bootstrapping node", Label("bootstrap"), func() {
 			poolType = "worker"
 			poolName += poolType + "-" + clusterName
 		}
-		machineReg = "machine-registration-" + poolType
-	})
+		machineReg := "machine-registration-" + poolType
 
-	It("Install node and add it in Rancher", func() {
 		By("Setting emulated TPM to "+emulateTPM, func() {
 			// Set correct value for TPM emulation
 			value := "false"

@@ -26,24 +26,24 @@ import (
 )
 
 var _ = Describe("E2E - Configure test", Label("configure"), func() {
-	type pattern struct {
-		key   string
-		value string
-	}
-
-	// Patterns to replace
-	basePatterns := []pattern{
-		{
-			key:   "%CLUSTER_NAME%",
-			value: clusterName,
-		},
-		{
-			key:   "%K8S_VERSION%",
-			value: k8sVersion,
-		},
-	}
-
 	It("Configure Rancher and libvirt", func() {
+		type pattern struct {
+			key   string
+			value string
+		}
+
+		// Patterns to replace
+		basePatterns := []pattern{
+			{
+				key:   "%CLUSTER_NAME%",
+				value: clusterName,
+			},
+			{
+				key:   "%K8S_VERSION%",
+				value: k8sVersion,
+			},
+		}
+
 		By("Creating a new cluster", func() {
 			// Create Yaml file
 			for _, p := range basePatterns {
